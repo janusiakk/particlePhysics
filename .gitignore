@@ -1,2 +1,5 @@
 #Compiled
 gen
+
+#Lsp
+.clangd
