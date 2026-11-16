@@ -1,0 +1,5 @@
+CompileFlags:
+  Add:
+    - -I/home/janusiakk/CERN/root/include
+    - -I/home/janusiakk/CERN/pythia8318/include
+    - -std=c++23
