@@ -5,3 +5,5 @@ LDFLAGS  = $(shell root-config --libs) -L$(PYTHIA8)/lib -lpythia8 -Wl,-rpath,$(P
 
 gen: generator.cpp
 	$(CXX) $(CXXFLAGS) -o $@ $< $(LDFLAGS)
+analysis: analysis.cpp
+	$(CXX) $(CXXFLAGS) -o $@ $< $(LDFLAGS)
