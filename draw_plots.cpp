@@ -9,8 +9,10 @@
 #include <vector>
 
 namespace fs = std::filesystem;
+using namespace std;
 
 void draw_plots(int argc, char *argv[]) {
+  // Output dir management
   const fs::path OutDir = (argc > 1) ? fs::path(argv[1]) : fs::current_path();
   const fs::path pngDir = OutDir / "png";
   const fs::path pdfDir = OutDir / "pdf";
@@ -18,10 +20,37 @@ void draw_plots(int argc, char *argv[]) {
   fs::create_directories(pngDir);
   fs::create_directories(pdfDir);
   TFile *f = TFile::Open("analysis.root");
+
   // Null ptr handling
   if (!f) {
-    std::cout << "Failed to open \"analysis.root\"";
+    cerr << "Failed to open \"analysis.root\"";
     return;
   }
 
+  // Predefined histograms
+  const vector<string> species = {
+      "charged", "piPlus", "piMinus", "kPlus", "kMinus", "proton", "pbar",
+  };
+  const vector<string> histTypes = {"hN", "hPt", "hEta", "hPhi"};
+
+  // Read checker for future pdf
+  bool ok = 1;
+  for (const string &h : histTypes) {
+    for (const string &s : species) {
+      const string name = h + "_" + s;
+      TH1D *hist = f->Get<TH1D>(name.c_str());
+      if (!hist) {
+        cerr << "Histogram not found: " << name << "\n";
+        ok = 0;
+        continue;
+      }
+      //Canvas loop
+      TCanvas *c = new TCanvas(("c_" + name).c_str(), name.c_str(), 1200, 900);
+      hist->Draw();
+      c->SaveAs((pngDir / (name + ".png")).string().c_str());
+      c->SaveAs((pdfDir / (name + ".pdf")).string().c_str());
+      delete c;
+
+    }
+  }
 }
