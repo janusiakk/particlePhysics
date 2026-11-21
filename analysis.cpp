@@ -17,7 +17,7 @@ struct Species {
 
 int main(int argc, char *argv[]) {
   const std::string inName = (argc > 1) ? argv[1] : "events.root";
-  const std::string outName = (argc > 2) ? argv[2] : "histograms.root";
+  const std::string outName = (argc > 2) ? argv[2] : "analysis.root";
 
   // File reading, TTree atribute reading
   TFile in(inName.c_str(), "READ");
@@ -30,6 +30,7 @@ int main(int argc, char *argv[]) {
   TTreeReaderArray<float> phi(reader, "phi");
 
   // Particle types with adequate pdg codes
+  // Code 0 is used as a placeholder for grouping all charged particles
   std::vector<Species> sp = {
       {"charged", "charged", 0},    {"piPlus", "#pi^{+}", 211},
       {"piMinus", "#pi^{-}", -211}, {"kPlus", "K^{+}", 321},
@@ -39,7 +40,7 @@ int main(int argc, char *argv[]) {
 
   TFile out(outName.c_str(), "RECREATE");
 
-  //Initialisating all 16 histograms
+  //Initialisating all 28 histograms
   for (auto &s : sp) {
     const std::string n = s.name;
     s.hN = new TH1D(("hN_" + n).c_str(), (s.title + ";N;P(N)").c_str(), 400, 0,
@@ -56,11 +57,11 @@ int main(int argc, char *argv[]) {
   }
 
   while (reader.Next()) {
-    for (auto &s : sp)
+    for (Species &s : sp)
       s.n = 0; //particle counter per event
     for (size_t i = 0; i < id.GetSize(); ++i) {
       const int pid = id[i];
-      for (auto &s : sp) {
+      for (Species &s : sp) {
         //Sorting
         const bool match = (s.pdg == 0) ? (isCharged[i] != 0) : (pid == s.pdg);
         if (!match)
@@ -71,7 +72,7 @@ int main(int argc, char *argv[]) {
         s.hPhi->Fill(phi[i]);
       }
     }
-    for (auto &s : sp)
+    for (Species &s : sp)
       s.hN->Fill(s.n);
   }
 
