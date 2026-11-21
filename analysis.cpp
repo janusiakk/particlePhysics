@@ -16,7 +16,7 @@ struct Species {
 };
 
 int main(int argc, char *argv[]) {
-  const std::string inName = (argc > 1) ? argv[1] : "events.root";
+  const std::string inName = (argc > 1) ? argv[1] : "data.root";
   const std::string outName = (argc > 2) ? argv[2] : "analysis.root";
 
   // File reading, TTree atribute reading
